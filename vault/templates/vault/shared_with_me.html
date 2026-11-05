@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CipherVault - Shared With Me</title>
+</head>
+<body>
+
+    <h1>Documents Shared With Me</h1>
+
+    {% if permissions %}
+        <ul>
+            {% for permission in permissions %}
+                <li>
+                    <strong>{{ permission.document.title }}</strong>
+
+                    <p>
+                        Owner: {{ permission.document.owner.username }}
+                    </p>
+
+                    <a href="{% url 'download_document' permission.document.id %}">
+                        Download Document
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No documents have been shared with you.</p>
+    {% endif %}
+
+    <p><a href="/">Back to Home</a></p>
+
+</body>
+</html>

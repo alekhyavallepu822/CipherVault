@@ -1,0 +1,23 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CipherVault - Share Document</title>
+</head>
+<body>
+    <h1>Share Document</h1>
+
+    {% if success %}
+        <h3>Document shared successfully!</h3>
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button type="submit">Share Document</button>
+    </form>
+
+    <p><a href="/">Back to Home</a></p>
+</body>
+</html>

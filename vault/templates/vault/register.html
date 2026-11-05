@@ -1,0 +1,10 @@
+{% if success %}
+    <h2>Registration Successful!</h2>
+    <p>Your account has been created successfully.</p>
+{% else %}
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Register</button>
+    </form>
+{% endif %}

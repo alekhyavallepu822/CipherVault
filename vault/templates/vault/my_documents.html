@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CipherVault - My Documents</title>
+</head>
+<body>
+
+    <h1>My Documents</h1>
+
+    <h2>Uploaded Documents</h2>
+
+    {% if documents %}
+        <ul>
+            {% for document in documents %}
+                <li>
+                    <strong>{{ document.title }}</strong>
+
+                    <p>Uploaded on: {{ document.uploaded_at }}</p>
+
+                    <a href="{% url 'download_document' document.id %}">
+                        Download Document
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>You have not uploaded any documents yet.</p>
+    {% endif %}
+
+    <hr>
+
+    <h2>Shared Access Management</h2>
+
+    {% for permission in permissions %}
+
+        <p>
+            <strong>{{ permission.document.title }}</strong>
+            shared with {{ permission.user.username }}
+        </p>
+
+        <form method="POST"
+              action="{% url 'revoke_permission' permission.id %}">
+
+            {% csrf_token %}
+
+            <button type="submit">Revoke Access</button>
+
+        </form>
+
+    {% empty %}
+        <p>No active shared permissions.</p>
+    {% endfor %}
+
+    <hr>
+
+    <p><a href="/upload/">Upload New Document</a></p>
+    <p><a href="/share/">Share Document</a></p>
+    <p><a href="/">Back to Home</a></p>
+
+</body>
+</html>

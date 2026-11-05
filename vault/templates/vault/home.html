@@ -1,67 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CipherVault</title>
-
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f1f5f9;
-            color: #1e293b;
-        }
-
-        header {
-            background: #172554;
-            color: white;
-            padding: 22px 50px;
-        }
-
-        .container {
-            text-align: center;
-            padding: 100px 20px;
-        }
-
-        h1 {
-            font-size: 42px;
-            color: #172554;
-        }
-
-        p {
-            font-size: 18px;
-            color: #475569;
-        }
-
-        .button {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 12px 25px;
-            background: #2563eb;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-        }
-    </style>
 </head>
-
 <body>
 
-    <header>
-        <h2>CipherVault</h2>
-    </header>
+    <h1>CipherVault</h1>
+    <h2>Secure Document Sharing</h2>
 
-    <div class="container">
-        <h1>Secure Document Sharing</h1>
+    <p>Share confidential documents securely with controlled access and activity tracking.</p>
 
-        <p>
-            Share confidential documents securely
-            with controlled access and activity tracking.
-        </p>
+    {% if user.is_authenticated %}
+        <h3>Welcome, {{ user.username }}!</h3>
 
-        <a href="#" class="button">Get Started</a>
-    </div>
+        <form method="POST" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit">Logout</button>
+        </form>
+
+    {% else %}
+        <a href="{% url 'register' %}">Register</a>
+        <a href="{% url 'login' %}">Login</a>
+    {% endif %}
 
 </body>
 </html>
