@@ -5,6 +5,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 
 from .models import Document, DocumentPermission, AuditLog
+from .forms import DocumentUploadForm
 
 
 class DocumentAccessTests(TestCase):
@@ -20,8 +21,8 @@ class DocumentAccessTests(TestCase):
             password='testpass123'
         )
 
-        self.unauthorized = User.objects.create_user(
-            username='unauthorized',
+        self.other_user = User.objects.create_user(
+            username='other',
             password='testpass123'
         )
 
@@ -34,9 +35,6 @@ class DocumentAccessTests(TestCase):
                 content_type='text/plain'
             )
         )
-
-    def tearDown(self):
-        self.document.file.delete(save=False)
 
     def test_owner_can_download_document(self):
         self.client.login(
@@ -70,9 +68,9 @@ class DocumentAccessTests(TestCase):
         self.assertEqual(response.status_code, 200)
         response.close()
 
-    def test_unauthorized_user_cannot_download(self):
+    def test_unauthorized_user_cannot_download_document(self):
         self.client.login(
-            username='unauthorized',
+            username='other',
             password='testpass123'
         )
 
@@ -81,18 +79,16 @@ class DocumentAccessTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 404)
-
         self.assertTrue(
             AuditLog.objects.filter(
-                user=self.unauthorized,
+                user=self.other_user,
                 document=self.document,
                 action='ACCESS_DENIED'
             ).exists()
         )
-
         response.close()
 
-    def test_revoked_viewer_cannot_download(self):
+    def test_revoked_viewer_cannot_download_document(self):
         DocumentPermission.objects.create(
             document=self.document,
             user=self.viewer,
@@ -109,7 +105,6 @@ class DocumentAccessTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 404)
-
         self.assertTrue(
             AuditLog.objects.filter(
                 user=self.viewer,
@@ -117,5 +112,43 @@ class DocumentAccessTests(TestCase):
                 action='ACCESS_DENIED'
             ).exists()
         )
-
         response.close()
+
+    def test_invalid_file_extension(self):
+        uploaded_file = SimpleUploadedFile(
+            'test.exe',
+            b'sample content'
+        )
+
+        form = DocumentUploadForm(
+            data={'title': 'Test Document'},
+            files={'file': uploaded_file}
+        )
+
+        self.assertFalse(form.is_valid())
+
+    def test_invalid_pdf_signature(self):
+        uploaded_file = SimpleUploadedFile(
+            'fake.pdf',
+            b'This is not a PDF file'
+        )
+
+        form = DocumentUploadForm(
+            data={'title': 'Test PDF'},
+            files={'file': uploaded_file}
+        )
+
+        self.assertFalse(form.is_valid())
+
+    def test_valid_pdf_upload(self):
+        uploaded_file = SimpleUploadedFile(
+            'valid.pdf',
+            b'%PDF-1.4 sample PDF content'
+        )
+
+        form = DocumentUploadForm(
+            data={'title': 'Valid PDF'},
+            files={'file': uploaded_file}
+        )
+
+        self.assertTrue(form.is_valid())
