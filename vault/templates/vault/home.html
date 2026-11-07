@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -11,7 +12,26 @@
     <p>Share confidential documents securely with controlled access and activity tracking.</p>
 
     {% if user.is_authenticated %}
+
         <h3>Welcome, {{ user.username }}!</h3>
+
+        <h3>Dashboard</h3>
+
+        <p>
+            <a href="{% url 'upload' %}">Upload Document</a>
+        </p>
+
+        <p>
+            <a href="{% url 'my_documents' %}">My Documents</a>
+        </p>
+
+        <p>
+            <a href="{% url 'share' %}">Share Document</a>
+        </p>
+
+        <p>
+            <a href="{% url 'shared_with_me' %}">Documents Shared With Me</a>
+        </p>
 
         <form method="POST" action="{% url 'logout' %}">
             {% csrf_token %}
@@ -19,8 +39,10 @@
         </form>
 
     {% else %}
+
         <a href="{% url 'register' %}">Register</a>
         <a href="{% url 'login' %}">Login</a>
+
     {% endif %}
 
 </body>
